@@ -222,6 +222,6 @@ if st.sidebar.button("Print Charts") and matched_dates:
             xaxis_rangeslider_visible=False
         )
 
-        pio.show(fig)
+        st.plotly_chart(fig, use_container_width=True)
 
 con.close()
