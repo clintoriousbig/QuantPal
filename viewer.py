@@ -138,7 +138,10 @@ st.title("DuckDB Table Viewer")
 st.dataframe(df)
 
 # Save matched dates
-matched_dates = df["date"].dt.date.unique().astype(str).tolist()
+matched_dates = (
+    df["date"].dt.date.unique().astype(str).tolist()
+)
+matched_dates = matched_dates[-20:]
 # Option 1: write to Streamlit's temp dir
 output_file = "/mount/tmp/matched_dates.json"
 
