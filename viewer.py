@@ -97,9 +97,6 @@ def plot_with_zero_coloring(df, x_col, y_cols, chart_title):
     )
     st.plotly_chart(fig, use_container_width=True)
 
-# ===== CONNECT TO DATABASE =====
-con = duckdb.connect('/Users/clintgilmore/Desktop/Analytics/scripts/analytics.db')
-
 # ===== RUN QUERY =====
 query = "SELECT * FROM rpt_aus200"
 df = con.execute(query).fetchdf()
