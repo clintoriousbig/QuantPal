@@ -1,0 +1,20 @@
+
+target/
+dbt_packages/
+logs/
+scripts/analytics.db
+*.csv
+*.db
+# Ignore DuckDB temp and data files
+*.db
+*.db.*
+*.tmp
+*.block
+
+# Ignore venv
+.venv/
+__pycache__/
+*.pyc
+
+# Ignore misc
+.DS_Store
