@@ -139,10 +139,10 @@ st.dataframe(df)
 
 # Save matched dates
 matched_dates = df["date"].dt.date.unique().astype(str).tolist()
-output_folder = "/mount/tmp"
-os.makedirs(output_folder, exist_ok=True)
-with open(os.path.join(output_folder, "matched_dates.json"), "w") as f:
+output_file = "/mount/tmp/matched_dates.json"
+with open(output_file, "w") as f:
     json.dump(matched_dates, f)
+
 
 numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
