@@ -139,7 +139,7 @@ st.dataframe(df)
 
 # Save matched dates
 matched_dates = df["date"].dt.date.unique().astype(str).tolist()
-output_folder = "/Users/clintgilmore/Desktop/Analytics/data"
+output_folder = "/mount/tmp"
 os.makedirs(output_folder, exist_ok=True)
 with open(os.path.join(output_folder, "matched_dates.json"), "w") as f:
     json.dump(matched_dates, f)
