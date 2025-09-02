@@ -6,6 +6,19 @@ import os
 import plotly.graph_objects as go
 import numpy as np
 import plotly.io as pio
+import gdown
+
+# ===== DATABASE SETUP =====
+DB_PATH = "analytics.db"
+
+# Download DB from Google Drive if not present
+if not os.path.exists(DB_PATH):
+    url = "https://drive.google.com/uc?id=12S8__qk8So1Odcmw565xGl2-JVhhP6L1"  # ✅ fixed link
+    st.sidebar.write("Downloading database from Google Drive... please wait ⏳")
+    gdown.download(url, DB_PATH, quiet=False)
+
+# Connect to the downloaded DB
+con = duckdb.connect(DB_PATH)
 
 # ===== FUNCTION DEFINITIONS =====
 def calculate_stats(df, cols):
@@ -159,9 +172,8 @@ st.sidebar.header("Candlestick Charts")
 if st.sidebar.button("Print Charts") and matched_dates:
     TF = "5m"
     TABLE_NAME = f"main.stg_aus_{TF}"
-    DB_FILE = "/Users/clintgilmore/Desktop/Analytics/scripts/analytics.db"
 
-    con2 = duckdb.connect(DB_FILE)
+    con2 = duckdb.connect(DB_PATH)
 
     date_list_str = ",".join([f"'{d}'" for d in matched_dates])
     query = f"""
