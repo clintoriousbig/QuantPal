@@ -13,7 +13,7 @@ DB_PATH = "analytics.db"
 
 # Download DB from Google Drive if not present
 if not os.path.exists(DB_PATH):
-    url = "https://drive.google.com/file/d/1fI_mfe4I0wWguqj9Y6S7twBnek2hatLt"  # ✅ fixed link
+    url = "https://drive.google.com/uc?id=1fI_mfe4I0wWguqj9Y6S7twBnek2hatLt"  # ✅ latest link 04/09
     st.sidebar.write("Downloading database from Google Drive... please wait ⏳")
     gdown.download(url, DB_PATH, quiet=False)
 
