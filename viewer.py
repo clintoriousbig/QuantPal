@@ -143,7 +143,12 @@ matched_dates = (
 )
 matched_dates = matched_dates[-20:]
 # Option 1: write to Streamlit's temp dir
-output_file = "/mount/tmp/matched_dates.json"
+
+output_file = "matched_dates.json"
+with open(output_file, "w") as f:
+    json.dump(matched_dates, f)
+st.sidebar.success(f"Matched dates saved to {output_file}")
+
 
 # Fallback: if /mount/tmp/ isn't writable, use current working directory
 try:
@@ -176,7 +181,6 @@ if cols_chart2:
     plot_with_zero_coloring(df, 'date', cols_chart2, "Chart 2: Selected Metrics with Zero-Based Coloring")
 
 # ===== PRINT CHARTS IN BROWSER =====
-pio.renderers.default = "browser"
 
 st.sidebar.header("Candlestick Charts")
 if st.sidebar.button("Print Charts") and matched_dates:
