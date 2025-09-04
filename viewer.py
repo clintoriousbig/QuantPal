@@ -134,7 +134,7 @@ for col in filter_cols:
             df = df[(df[col] >= start) & (df[col] <= end)]
 
 # ===== STREAMLIT UI =====
-st.title("DuckDB Table Viewer")
+st.title("AUS200 historical moves")
 st.dataframe(df)
 
 # Save matched dates
