@@ -308,9 +308,11 @@ st.sidebar.success(f"Found {len(matched_dates)} dates for charts.")
 
 numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
+human_readable_options = [filter_name_map[col] for col in df.select_dtypes(include='number').columns if col in filter_name_map]
+
 # === Chart 1 ===
 st.header("Chart 1: Select metrics")
-selected_names_c1 = st.multiselect("Columns for chart 1", options=filter_name_map, key="c1")
+selected_names_c1 = st.multiselect("Columns for chart 1", options=human_readable_options, key="c1")
 cols_chart1 = [name_filter_map[name] for name in selected_names_c1]
 if cols_chart1:
     st.subheader("Statistics for Chart 1 Metrics")
@@ -319,7 +321,7 @@ if cols_chart1:
 
 # === Chart 2 ===
 st.header("Chart 2: Select metrics")
-selected_names_c2 = st.multiselect("Columns for chart 2", options=filter_name_map, key="c2")
+selected_names_c2 = st.multiselect("Columns for chart 2", options=human_readable_options, key="c2")
 cols_chart2 = [name_filter_map[name] for name in selected_names_c2]
 if cols_chart2:
     st.subheader("Statistics for Chart 2 Metrics")
