@@ -121,8 +121,8 @@ def plot_high_low_separate_charts(df):
 
     # Create a complete list of all possible times between 10:00:00 and 16:00:00
     # Assuming the times are for every minute
-    start_time = pd.to_datetime('10:00:00').time()
-    end_time = pd.to_datetime('16:00:00').time()
+    start_time = pd.to_datetime('09:00:00').time()
+    end_time = pd.to_datetime('17:00:00').time()
     all_times = pd.date_range(start_time.strftime('%H:%M:%S'), end_time.strftime('%H:%M:%S'), freq='1min').time
     
     # Create a complete dataframe with all times and an initial count of 0
@@ -183,7 +183,7 @@ def plot_high_low_separate_charts(df):
         )
         st.plotly_chart(fig_low, use_container_width=True)
 
-        
+
 # ===== RUN QUERY =====
 query = "SELECT * FROM rpt_aus200"
 df = load_data(query)
