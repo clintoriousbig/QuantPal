@@ -230,9 +230,6 @@ filter_groups = {
     "SPX RTH Metrics": ['spx_950', 'spx_10']
 }
 
-# Place filter selection in a sidebar
-st.sidebar.header("Filters")
-
 # Create a copy of the dataframe to apply filters
 filtered_df = df.copy()
 
@@ -328,7 +325,7 @@ df = filtered_df
 # ===== STREAMLIT UI =====
 st.title("AUS200 historical moves")
 
-st.metric("Filtered Days", df.shape[0])
+st.metric("Matched Days", df.shape[0])
 st.metric("Avg Daily Change", f"{df['change_pct'].mean():.2f}%")
 st.metric("Avg RTH Change", f"{df['rth_change_pts'].mean():.2f}%")
 
