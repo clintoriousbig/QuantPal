@@ -132,7 +132,7 @@ def plot_high_low_separate_charts(df):
     col1, col2 = st.columns(2)
 
     with col1:
-        # --- Plot 1: RTH High Occurrences (Green Bars) ---
+        # --- Plot 1: RTH High Occurrences (red Bars) ---
         high_counts = df['rth_high'].value_counts().reset_index()
         high_counts.columns = ['time', 'occurrences']
         high_counts['time'] = pd.to_datetime(high_counts['time'], format='%H:%M:%S').dt.time
@@ -148,7 +148,7 @@ def plot_high_low_separate_charts(df):
             y='occurrences',
             title="RTH High Time Occurrences",
         )
-        fig_high.update_traces(marker_color='green')
+        fig_high.update_traces(marker_color='red')
         fig_high.update_layout(
             xaxis_title="Time",
             yaxis_title="Number of Occurrences",
@@ -158,7 +158,7 @@ def plot_high_low_separate_charts(df):
         st.plotly_chart(fig_high, use_container_width=True)
 
     with col2:
-        # --- Plot 2: RTH Low Occurrences (Red Bars) ---
+        # --- Plot 2: RTH Low Occurrences (green Bars) ---
         low_counts = df['rth_low'].value_counts().reset_index()
         low_counts.columns = ['time', 'occurrences']
         low_counts['time'] = pd.to_datetime(low_counts['time'], format='%H:%M:%S').dt.time
@@ -174,7 +174,7 @@ def plot_high_low_separate_charts(df):
             y='occurrences',
             title="RTH Low Time Occurrences",
         )
-        fig_low.update_traces(marker_color='red')
+        fig_low.update_traces(marker_color='green')
         fig_low.update_layout(
             xaxis_title="Time",
             yaxis_title="Number of Occurrences",
