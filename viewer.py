@@ -257,6 +257,7 @@ filter_groups = {
 }
 
 # ===== STREAMLIT FILTERS (UPDATED) =====
+st.sidebar.title("QantPal")
 st.sidebar.header("Filters")
 # Create a copy of the dataframe to apply filters
 filtered_df = df.copy()
