@@ -164,50 +164,6 @@ df['date'] = pd.to_datetime(df['date'])
 # ===== STREAMLIT FILTERS =====
 st.sidebar.header("Filters")# Create a mapping from snake_case to human-readable names
 
-# Create a copy of the dataframe to apply filters
-filtered_df = df.copy()
-
-# Loop through each filter group to create an expander
-for group_name, group_cols in filter_groups.items():
-    with st.sidebar.expander(group_name, expanded=False): # Set expanded=True to have them open by default
-        
-        # Loop through the columns within the current group
-        for col in group_cols:
-            # Check if the column exists in the DataFrame before attempting to filter
-            if col in df.columns:
-                human_name = filter_name_map[col]
-
-                if df[col].dtype == 'object':
-                    options = df[col].dropna().unique().tolist()
-                    selected = st.multiselect(f"Filter {human_name}", options, key=f"multiselect_{col}")
-                    if selected:
-                        filtered_df = filtered_df[filtered_df[col].isin(selected)]
-                
-                elif pd.api.types.is_numeric_dtype(df[col]):
-                    min_val, max_val = float(df[col].min()), float(df[col].max())
-                    selected_range = st.slider(
-                        f"Filter {human_name}",
-                        min_val,
-                        max_val,
-                        (min_val, max_val),
-                        key=f"slider_{col}"
-                    )
-                    filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
-                
-                elif pd.api.types.is_datetime64_any_dtype(df[col]):
-                    min_date, max_date = df[col].min(), df[col].max()
-                    date_range = st.date_input(
-                        f"Filter {human_name}",
-                        [min_date, max_date],
-                        key=f"date_{col}"
-                    )
-                    if len(date_range) == 2:
-                        start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
-                        filtered_df = filtered_df[(filtered_df[col] >= start) & (filtered_df[col] <= end)]
-
-# Update the main DataFrame to the filtered version
-df = filtered_df
-
 filter_name_map = {
     'aus_gap_pct': 'AUS Gap (%)',
     'spx_gap_pct': 'SPX Gap (%)',
@@ -273,6 +229,53 @@ filter_groups = {
     "News 📰": ['news', 'news_impact'],
     "SPX RTH Metrics 🇺🇸": ['spx_950', 'spx_10']
 }
+
+# Place filter selection in a sidebar
+st.sidebar.header("Filters")
+
+# Create a copy of the dataframe to apply filters
+filtered_df = df.copy()
+
+# Loop through each filter group to create an expander
+for group_name, group_cols in filter_groups.items():
+    with st.sidebar.expander(group_name, expanded=False): # Set expanded=True to have them open by default
+        
+        # Loop through the columns within the current group
+        for col in group_cols:
+            # Check if the column exists in the DataFrame before attempting to filter
+            if col in df.columns:
+                human_name = filter_name_map[col]
+
+                if df[col].dtype == 'object':
+                    options = df[col].dropna().unique().tolist()
+                    selected = st.multiselect(f"Filter {human_name}", options, key=f"multiselect_{col}")
+                    if selected:
+                        filtered_df = filtered_df[filtered_df[col].isin(selected)]
+                
+                elif pd.api.types.is_numeric_dtype(df[col]):
+                    min_val, max_val = float(df[col].min()), float(df[col].max())
+                    selected_range = st.slider(
+                        f"Filter {human_name}",
+                        min_val,
+                        max_val,
+                        (min_val, max_val),
+                        key=f"slider_{col}"
+                    )
+                    filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
+                
+                elif pd.api.types.is_datetime64_any_dtype(df[col]):
+                    min_date, max_date = df[col].min(), df[col].max()
+                    date_range = st.date_input(
+                        f"Filter {human_name}",
+                        [min_date, max_date],
+                        key=f"date_{col}"
+                    )
+                    if len(date_range) == 2:
+                        start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
+                        filtered_df = filtered_df[(filtered_df[col] >= start) & (filtered_df[col] <= end)]
+
+# Update the main DataFrame to the filtered version
+df = filtered_df
 
 # Create a master list of all columns to be filtered, using human-readable names
 all_filter_options = [filter_name_map[col] for group in filter_groups.values() for col in group if col in df.columns]
