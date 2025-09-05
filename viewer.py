@@ -279,11 +279,11 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("Total Days", df.shape[0])
 with col2:
-    st.metric("Avg Daily Change (%)", f"{df['change_pct'].mean():.2f}")
+    st.metric("Mean Daily Change (%)", f"{df['change_pct'].mean()}")
 with col3:
     st.metric("Avg Open Gap (%)", f"{df['aus_gap_pct'].mean():.2f}")
 with col4:
-    st.metric("Avg RTH Change (pts)", f"{df['rth_change_pts'].mean():.2f}")
+    st.metric("Avg RTH Range (pts)", f"{df['rth_range'].mean():.2f}")
 
 # Histogram for Daily Change
 st.subheader("Distribution of Daily Change (%)")
