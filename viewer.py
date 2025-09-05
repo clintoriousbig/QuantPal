@@ -272,17 +272,6 @@ df = filtered_df
 
 # ===== STREAMLIT UI (UPDATED) =====
 st.title("QuantPal AUS200 Dashboard")
-logo_url = "https://drive.google.com/uc?export=download&id=1wrvaSwWQXoP-QKXq-pPzVK5qu73WFtEG" #https://drive.google.com/file/d/1wrvaSwWQXoP-QKXq-pPzVK5qu73WFtEG/view?usp=sharing
-landing_page_url = "https://your-landing-page.com" # Replace with your actual landing page URL
-logo_html = f"""
-    <div style="float: left; margin-right: 20px;">
-        <a href="{landing_page_url}" target="_blank">
-            <img src="{logo_url}" alt="Logo" style="width: 150px; border-radius: 10px;">
-        </a>
-    </div>
-"""
-st.markdown(logo_html, unsafe_allow_html=True)
-st.markdown("<h1>AUS200 Historical Moves</h1>", unsafe_allow_html=True)
 
 ## Section 1: Key Metrics and Data Insights
 st.header("Key Insights")
