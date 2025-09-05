@@ -211,11 +211,11 @@ name_filter_map = {v: k for k, v in filter_name_map.items()}
 
 # Define filter groups
 filter_groups = {
-    "Open Gaps 📊": ['aus_gap_pct', 'spx_gap_pct'],
-    "Previous Day Metrics 🗓️": ['aus_prev_pct', 'uk_prev_pct', 'bco_prev_pct', 'xau_prev_pct', 'spx_prev_pct', 'aud_prev_pct', 'prev_up_wick', 'prev_low_wick'],
-    "RTH Metrics 📈": ['rth_change_pts', 'rth_open2high', 'rth_open2low', 'rth_range'],
-    "Daily Moves ⏳": ['change_pct'],
-    "Early Morning Moves (5m/10m) ☕": [
+    "Open Gaps": ['aus_gap_pct', 'spx_gap_pct'],
+    "Previous Day Metrics": ['aus_prev_pct', 'uk_prev_pct', 'bco_prev_pct', 'xau_prev_pct', 'spx_prev_pct', 'aud_prev_pct', 'prev_up_wick', 'prev_low_wick'],
+    "RTH Metrics": ['rth_change_pts', 'rth_open2high', 'rth_open2low', 'rth_range'],
+    "Daily Moves": ['change_pct'],
+    "Early Morning Moves (5m/10m)": [
         'aus_950', 'aus_955', 'aus_1000', 'aus_1005',
         'open2high_950', 'open2low_950',
         'pct_to_high_1000', 'pct_to_low_1000',
@@ -225,9 +225,9 @@ filter_groups = {
         'pct_to_high_1020',
         'pct_to_low_1020'
     ],
-    "Hourly Moves ⏰": ['pct_9am', 'up_wick_9am', 'low_wick_9am', 'pct_10am', 'up_wick_10am', 'low_wick_10am'],
-    "News 📰": ['news', 'news_impact'],
-    "SPX RTH Metrics 🇺🇸": ['spx_950', 'spx_10']
+    "Hourly Moves": ['pct_9am', 'up_wick_9am', 'low_wick_9am', 'pct_10am', 'up_wick_10am', 'low_wick_10am'],
+    "News": ['news', 'news_impact'],
+    "SPX RTH Metrics": ['spx_950', 'spx_10']
 }
 
 # Place filter selection in a sidebar
