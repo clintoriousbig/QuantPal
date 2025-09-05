@@ -327,7 +327,10 @@ df = filtered_df
 
 # ===== STREAMLIT UI =====
 st.title("AUS200 historical moves")
-st.dataframe(df)
+
+st.metric("Filtered Days", df.shape[0])
+st.metric("Avg Daily Change", f"{df['change_pct'].mean():.2f}%")
+st.metric("Avg RTH Change", f"{df['rth_change_pts'].mean():.2f}%")
 
 # Call the new function to plot the RTH high/low occurrences
 st.header("RTH High and Low Time Occurrences")
