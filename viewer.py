@@ -14,7 +14,12 @@ FILE_ID = "16YZgg2AU5k7XijCcrv_8lQov0--xXqJa"
 
 url = f"https://drive.google.com/uc?id={FILE_ID}"
 st.sidebar.info("Downloading latest database... ⏳")
-gdown.download(url, DB_PATH, quiet=False, fuzzy=True)
+gdown.download(url, DB_PATH, quiet=False, fuzzy=False)
+
+# Verify the DB exists and isn't empty
+if not os.path.exists(DB_PATH) or os.path.getsize(DB_PATH) < 1000:
+    st.error("❌ Database download failed! Check the Google Drive link or permissions.")
+    st.stop()
 
 # Connect to the downloaded DB
 con = duckdb.connect(DB_PATH)
