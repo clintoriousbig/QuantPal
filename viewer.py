@@ -330,8 +330,8 @@ if cols_chart2:
 
 # ===== PRINT CHARTS IN BROWSER =====
 
-st.sidebar.header("Candlestick Charts")
-if st.sidebar.button("Print Charts") and st.session_state.get('matched_dates'):
+st.sidebar.header("Charts")
+if st.sidebar.button("Print 5m RTH Chart") and st.session_state.get('matched_dates'):
     with st.spinner("Generating candlestick charts..."):
         TF = "5m"
         TABLE_NAME = f"main.stg_aus_{TF}"
