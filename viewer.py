@@ -162,7 +162,124 @@ df = load_data(query)
 df['date'] = pd.to_datetime(df['date'])
 
 # ===== STREAMLIT FILTERS =====
+st.sidebar.header("Filters")# Create a mapping from snake_case to human-readable names
+
+filter_name_map = {
+    'aus_gap_pct': 'AUS Gap (%)',
+    'spx_gap_pct': 'SPX Gap (%)',
+    'aus_prev_pct': 'AUS Prev Day (%)',
+    'uk_prev_pct': 'UK Prev Day (%)',
+    'bco_prev_pct': 'BCO Prev Day (%)',
+    'xau_prev_pct': 'XAU Prev Day (%)',
+    'spx_prev_pct': 'SPX Prev Day (%)',
+    'aud_prev_pct': 'AUD Prev Day (%)',
+    'rth_change_pts': 'RTH Change (pts)',
+    'rth_open2high': 'RTH Open-to-High (%)',
+    'rth_open2low': 'RTH Open-to-Low (%)',
+    'rth_range': 'RTH Range',
+    'change_pct': 'Daily Change (%)',
+    'prev_up_wick': 'Prev Day Upper Wick (%)',
+    'prev_low_wick': 'Prev Day Lower Wick (%)',
+    'pct_9am': '9 AM Change (%)',
+    'up_wick_9am': '9 AM Upper Wick (%)',
+    'low_wick_9am': '9 AM Lower Wick (%)',
+    'pct_10am': '10 AM Change (%)',
+    'up_wick_10am': '10 AM Upper Wick (%)',
+    'low_wick_10am': '10 AM Lower Wick (%)',
+    'aus_950': '9:50 AM Move (%)',
+    'aus_955': '9:55 AM Move (%)',
+    'aus_1000': '10:00 AM Move (%)',
+    'aus_1005': '10:05 AM Move (%)',
+    'open2high_950': '9:50 AM Open-to-High (%)',
+    'open2low_950': '9:50 AM Open-to-Low (%)',
+    'pct_to_high_1000': '10:00 AM Open-to-High (%)',
+    'pct_to_low_1000': '10:00 AM Open-to-Low (%)',
+    'pct_change_1010': '10:10 AM Change (%)',
+    'pct_to_high_1010': '10:10 AM Open-to-High (%)',
+    'pct_to_low_1010': '10:10 AM Open-to-Low (%)',
+    'pct_change_1020': '10:20 AM Change (%)',
+    'pct_to_high_1020': '10:20 AM Open-to-High (%)',
+    'pct_to_low_1020': '10:20 AM Open-to-Low (%)',
+    'spx_950': 'SPX 9:50 AM Move (%)',
+    'spx_10': 'SPX 10 AM Move (%)',
+    'news': 'News Description',
+    'news_impact': 'News Impact'
+}
+
+# Invert the map for lookups
+name_filter_map = {v: k for k, v in filter_name_map.items()}
+
+# Define filter groups
+filter_groups = {
+    "Open Gaps 📊": ['aus_gap_pct', 'spx_gap_pct'],
+    "Previous Day Metrics 🗓️": ['aus_prev_pct', 'uk_prev_pct', 'bco_prev_pct', 'xau_prev_pct', 'spx_prev_pct', 'aud_prev_pct', 'prev_up_wick', 'prev_low_wick'],
+    "RTH Metrics 📈": ['rth_change_pts', 'rth_open2high', 'rth_open2low', 'rth_range'],
+    "Daily Moves ⏳": ['change_pct'],
+    "Early Morning Moves (5m/10m) ☕": [
+        'aus_950', 'aus_955', 'aus_1000', 'aus_1005',
+        'open2high_950', 'open2low_950',
+        'pct_to_high_1000', 'pct_to_low_1000',
+        'pct_change_1010', 'pct_to_high_1010',
+        'pct_to_low_1010',
+        'pct_change_1020',
+        'pct_to_high_1020',
+        'pct_to_low_1020'
+    ],
+    "Hourly Moves ⏰": ['pct_9am', 'up_wick_9am', 'low_wick_9am', 'pct_10am', 'up_wick_10am', 'low_wick_10am'],
+    "News 📰": ['news', 'news_impact'],
+    "SPX RTH Metrics 🇺🇸": ['spx_950', 'spx_10']
+}
+
+# Place filter selection in a sidebar
 st.sidebar.header("Filters")
+
+# Create a master list of all columns to be filtered, using human-readable names
+all_filter_options = [filter_name_map[col] for group in filter_groups.values() for col in group if col in df.columns]
+
+selected_filters = st.sidebar.multiselect(
+    "Select metrics to filter",
+    options=all_filter_options
+)
+
+# Build filters dynamically based on the selected options
+filtered_df = df.copy() # Create a copy to apply filters
+for group_name, group_cols in filter_groups.items():
+    
+    # Check if any of the columns in the group are in the user's selection
+    intersection = [col for col in group_cols if filter_name_map.get(col) in selected_filters]
+    
+    if intersection:
+        with st.sidebar.expander(group_name, expanded=True):
+            for col in intersection:
+                human_name = filter_name_map[col]
+
+                if df[col].dtype == 'object':
+                    options = df[col].dropna().unique().tolist()
+                    selected = st.sidebar.multiselect(f"Filter {human_name}", options)
+                    if selected:
+                        filtered_df = filtered_df[filtered_df[col].isin(selected)]
+                
+                elif pd.api.types.is_numeric_dtype(df[col]):
+                    # Make sure the column exists in the DataFrame before getting min/max
+                    if col in df.columns:
+                        min_val, max_val = float(df[col].min()), float(df[col].max())
+                        selected_range = st.sidebar.slider(
+                            f"Filter {human_name}",
+                            min_val,
+                            max_val,
+                            (min_val, max_val)
+                        )
+                        filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
+                
+                elif pd.api.types.is_datetime64_any_dtype(df[col]):
+                    min_date, max_date = df[col].min(), df[col].max()
+                    date_range = st.sidebar.date_input(f"Filter {human_name}", [min_date, max_date])
+                    if len(date_range) == 2:
+                        start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
+                        filtered_df = filtered_df[(filtered_df[col] >= start) & (filtered_df[col] <= end)]
+
+# Update the main DataFrame to the filtered version
+df = filtered_df
 
 # Let user pick which columns to filter
 filter_cols = st.sidebar.multiselect("Select columns to filter", df.columns)
