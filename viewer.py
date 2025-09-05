@@ -271,9 +271,9 @@ for group_name, group_cols in filter_groups.items():
 df = filtered_df
 
 # ===== STREAMLIT UI (UPDATED) =====
-st.title("AUS200 Historical Moves")
+st.title("QuantPal AUS200 Dashboard")
 logo_url = "https://drive.google.com/uc?export=download&id=1wrvaSwWQXoP-QKXq-pPzVK5qu73WFtEG" #https://drive.google.com/file/d/1wrvaSwWQXoP-QKXq-pPzVK5qu73WFtEG/view?usp=sharing
-landing_page_url = "https://coral-development-120771.framer.app/" # Replace with your actual landing page URL
+landing_page_url = "https://your-landing-page.com" # Replace with your actual landing page URL
 logo_html = f"""
     <div style="float: left; margin-right: 20px;">
         <a href="{landing_page_url}" target="_blank">
