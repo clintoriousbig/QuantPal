@@ -230,9 +230,6 @@ filter_groups = {
     "SPX RTH Metrics 🇺🇸": ['spx_950', 'spx_10']
 }
 
-# Place filter selection in a sidebar
-st.sidebar.header("Filters")
-
 # Create a master list of all columns to be filtered, using human-readable names
 all_filter_options = [filter_name_map[col] for group in filter_groups.values() for col in group if col in df.columns]
 
