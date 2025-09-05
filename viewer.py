@@ -138,12 +138,15 @@ for col in filter_cols:
 st.title("AUS200 historical moves")
 st.dataframe(df)
 
-# Save matched dates
-matched_dates = (
-    df["date"].dt.date.unique().astype(str).tolist()
-)
-matched_dates = matched_dates[-20:]
-# Option 1: write to Streamlit's temp dir
+# Get all unique dates, sort them, and then get the 20 most recent
+unique_dates = df['date'].dt.date.unique()
+sorted_dates = pd.to_datetime(unique_dates).sort_values(ascending=True)
+matched_dates = sorted_dates[-20:].strftime('%Y-%m-%d').tolist()
+
+# Write to Streamlit's session state instead of a file
+st.session_state['matched_dates'] = matched_dates
+
+st.sidebar.success(f"Found {len(matched_dates)} dates for charts.")
 
 output_file = "matched_dates.json"
 with open(output_file, "w") as f:
