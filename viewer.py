@@ -10,7 +10,7 @@ import gdown
 
 # ===== DATABASE SETUP =====
 DB_PATH = "analytics.db"
-FILE_ID = "1fI_mfe4I0wWguqj9Y6S7twBnek2hatLt"
+FILE_ID = "16YZgg2AU5k7XijCcrv_8lQov0--xXqJa"
 
 # Download the DB if it doesn't exist
 if not os.path.exists(DB_PATH):
