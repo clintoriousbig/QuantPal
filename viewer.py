@@ -258,27 +258,58 @@ if st.sidebar.button("Print Charts") and st.session_state.get('matched_dates'):
         df_candles = con2.execute(query).df()
         con2.close()
 
-        for date_str in st.session_state['matched_dates']:
-            daily_data = df_candles[df_candles['time'].dt.date.astype(str) == date_str]
+        # Create a list of the unique dates to iterate over
+        sorted_dates = st.session_state['matched_dates']
 
-            if not daily_data.empty:
-                fig = go.Figure(data=[go.Candlestick(
-                    x=daily_data['time'],
-                    open=daily_data['open'],
-                    high=daily_data['high'],
-                    low=daily_data['low'],
-                    close=daily_data['close'],
-                    increasing_line_color='green',
-                    decreasing_line_color='red'
-                )])
+        # Loop through the dates in steps of 2
+        for i in range(0, len(sorted_dates), 2):
+            # Create two columns for each pair of charts
+            col1, col2 = st.columns(2)
 
-                fig.update_layout(
-                    title=f"AUS200 {TF} Intraday: {date_str} (9AM-4PM NSW)",
-                    xaxis_title="Time",
-                    yaxis_title="Price",
-                    xaxis_rangeslider_visible=False
-                )
+            # Get the data for the first chart in the pair
+            date1_str = sorted_dates[i]
+            daily_data1 = df_candles[df_candles['time'].dt.date.astype(str) == date1_str]
+            
+            with col1:
+                if not daily_data1.empty:
+                    fig1 = go.Figure(data=[go.Candlestick(
+                        x=daily_data1['time'],
+                        open=daily_data1['open'],
+                        high=daily_data1['high'],
+                        low=daily_data1['low'],
+                        close=daily_data1['close'],
+                        increasing_line_color='green',
+                        decreasing_line_color='red'
+                    )])
+                    fig1.update_layout(
+                        title=f"AUS200 {TF} Intraday: {date1_str} (9AM-4PM NSW)",
+                        xaxis_rangeslider_visible=False
+                    )
+                    st.plotly_chart(fig1, use_container_width=True)
 
-                st.plotly_chart(fig, use_container_width=True)
+            # Check if a second chart exists in the pair
+            if i + 1 < len(sorted_dates):
+                # Get the data for the second chart
+                date2_str = sorted_dates[i+1]
+                daily_data2 = df_candles[df_candles['time'].dt.date.astype(str) == date2_str]
+                
+                with col2:
+                    if not daily_data2.empty:
+                        fig2 = go.Figure(data=[go.Candlestick(
+                            x=daily_data2['time'],
+                            open=daily_data2['open'],
+                            high=daily_data2['high'],
+                            low=daily_data2['low'],
+                            close=daily_data2['close'],
+                            increasing_line_color='green',
+                            decreasing_line_color='red'
+                        )])
+                        fig2.update_layout(
+                            title=f"AUS200 {TF} Intraday: {date2_str} (9AM-4PM NSW)",
+                            xaxis_rangeslider_visible=False
+                        )
+                        st.plotly_chart(fig2, use_container_width=True)
+
+        st.success("All charts generated!")
 
 con.close()
