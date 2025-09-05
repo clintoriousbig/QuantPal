@@ -12,14 +12,22 @@ import gdown
 DB_PATH = "analytics.db"
 FILE_ID = "1r364Oitl8CnQ7-13e2egGOQ8mLwcv-JD"
 
-# Download the DB if it doesn't exist
-if not os.path.exists(DB_PATH):
-    st.sidebar.info("Downloading database... please wait ⏳")
-    url = f"https://drive.google.com/uc?id={FILE_ID}"
-    gdown.download(url, DB_PATH, quiet=False)
-    
-# Connect to the downloaded DB
-con = duckdb.connect(DB_PATH)
+URL = f"https://drive.google.com/uc?id={FILE_ID}"
+
+# ---- Button to refresh ----
+if st.sidebar.button("🔄 Refresh Database"):
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+    st.sidebar.info("Downloading latest database... ⏳")
+    gdown.download(URL, DB_PATH, quiet=False, fuzzy=False)
+    st.sidebar.success("Database updated ✅")
+
+# ---- Cached DB loader ----
+@st.cache_resource
+def get_connection():
+    return duckdb.connect(DB_PATH, read_only=True)
+
+con = get_connection()
 
 # ===== FUNCTION DEFINITIONS =====
 def calculate_stats(df, cols):
