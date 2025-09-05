@@ -281,34 +281,6 @@ for group_name, group_cols in filter_groups.items():
 # Update the main DataFrame to the filtered version
 df = filtered_df
 
-# Let user pick which columns to filter
-filter_cols = st.sidebar.multiselect("Select columns to filter", df.columns)
-
-# Build filters dynamically
-for col in filter_cols:
-    if df[col].dtype == 'object':
-        options = df[col].dropna().unique().tolist()
-        selected = st.sidebar.multiselect(f"Filter {col}", options)
-        if selected:
-            df = df[df[col].isin(selected)]
-
-    elif pd.api.types.is_numeric_dtype(df[col]):
-        min_val, max_val = float(df[col].min()), float(df[col].max())
-        selected = st.sidebar.slider(
-            f"Filter {col}",
-            min_val,
-            max_val,
-            (min_val, max_val)
-        )
-        df = df[(df[col] >= selected[0]) & (df[col] <= selected[1])]
-
-    elif pd.api.types.is_datetime64_any_dtype(df[col]):
-        min_date, max_date = df[col].min(), df[col].max()
-        date_range = st.sidebar.date_input(f"Filter {col}", [min_date, max_date])
-        if len(date_range) == 2:
-            start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
-            df = df[(df[col] >= start) & (df[col] <= end)]
-
 # ===== STREAMLIT UI =====
 st.title("AUS200 historical moves")
 st.dataframe(df)
