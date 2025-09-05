@@ -138,12 +138,12 @@ for col in filter_cols:
 st.title("AUS200 historical moves")
 st.dataframe(df)
 
-# Get all unique dates, sort them, and then get the 20 most recent
+# Get all unique dates, sort them in descending order, and then get the top 20
 unique_dates = df['date'].dt.date.unique()
-sorted_dates = pd.to_datetime(unique_dates).sort_values(ascending=True)
-matched_dates = sorted_dates[-20:].strftime('%Y-%m-%d').tolist()
+sorted_dates = pd.to_datetime(unique_dates).sort_values(ascending=False)
+matched_dates = sorted_dates[:20].strftime('%Y-%m-%d').tolist()
 
-# Write to Streamlit's session state instead of a file
+# Write to Streamlit's session state
 st.session_state['matched_dates'] = matched_dates
 
 st.sidebar.success(f"Found {len(matched_dates)} dates for charts.")
