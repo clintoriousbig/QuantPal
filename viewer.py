@@ -112,49 +112,78 @@ def plot_with_zero_coloring(df, x_col, y_cols, chart_title):
 
 def plot_high_low_separate_charts(df):
     """
-    Generates two separate bar charts for RTH High and RTH Low occurrences.
+    Generates two separate bar charts for RTH High and RTH Low occurrences,
+    showing all possible times on the x-axis.
     """
     if 'rth_high' not in df.columns or 'rth_low' not in df.columns:
         st.error("The dataframe must contain 'rth_high' and 'rth_low' columns.")
         return
+
+    # Create a complete list of all possible times between 10:00:00 and 16:00:00
+    # Assuming the times are for every minute
+    start_time = pd.to_datetime('10:00:00').time()
+    end_time = pd.to_datetime('16:00:00').time()
+    all_times = pd.date_range(start_time.strftime('%H:%M:%S'), end_time.strftime('%H:%M:%S'), freq='1min').time
     
-    # Create two columns to display the charts side by side
+    # Create a complete dataframe with all times and an initial count of 0
+    full_time_df = pd.DataFrame(all_times, columns=['time'])
+    full_time_df['occurrences'] = 0
+
     col1, col2 = st.columns(2)
-    
+
     with col1:
         # --- Plot 1: RTH High Occurrences (Green Bars) ---
         high_counts = df['rth_high'].value_counts().reset_index()
         high_counts.columns = ['time', 'occurrences']
         high_counts['time'] = pd.to_datetime(high_counts['time'], format='%H:%M:%S').dt.time
-        high_counts = high_counts.sort_values(by='time')
+
+        # Merge the full time range with the actual high counts
+        merged_high_df = pd.merge(full_time_df, high_counts, on='time', how='left', suffixes=('_full', '_actual'))
+        merged_high_df['occurrences'] = merged_high_df['occurrences_actual'].fillna(0)
+        merged_high_df = merged_high_df.drop(columns=['occurrences_full', 'occurrences_actual'])
 
         fig_high = px.bar(
-            high_counts,
+            merged_high_df,
             x='time',
             y='occurrences',
             title="RTH High Time Occurrences",
         )
         fig_high.update_traces(marker_color='green')
-        fig_high.update_layout(xaxis_title="Time", yaxis_title="Number of Occurrences", title_x=0.5, xaxis={'type': 'category'})
+        fig_high.update_layout(
+            xaxis_title="Time",
+            yaxis_title="Number of Occurrences",
+            title_x=0.5,
+            xaxis={'type': 'category', 'categoryorder': 'array', 'categoryarray': merged_high_df['time']}
+        )
         st.plotly_chart(fig_high, use_container_width=True)
-    
+
     with col2:
         # --- Plot 2: RTH Low Occurrences (Red Bars) ---
         low_counts = df['rth_low'].value_counts().reset_index()
         low_counts.columns = ['time', 'occurrences']
         low_counts['time'] = pd.to_datetime(low_counts['time'], format='%H:%M:%S').dt.time
-        low_counts = low_counts.sort_values(by='time')
+
+        # Merge the full time range with the actual low counts
+        merged_low_df = pd.merge(full_time_df, low_counts, on='time', how='left', suffixes=('_full', '_actual'))
+        merged_low_df['occurrences'] = merged_low_df['occurrences_actual'].fillna(0)
+        merged_low_df = merged_low_df.drop(columns=['occurrences_full', 'occurrences_actual'])
 
         fig_low = px.bar(
-            low_counts,
+            merged_low_df,
             x='time',
             y='occurrences',
             title="RTH Low Time Occurrences",
         )
         fig_low.update_traces(marker_color='red')
-        fig_low.update_layout(xaxis_title="Time", yaxis_title="Number of Occurrences", title_x=0.5, xaxis={'type': 'category'})
+        fig_low.update_layout(
+            xaxis_title="Time",
+            yaxis_title="Number of Occurrences",
+            title_x=0.5,
+            xaxis={'type': 'category', 'categoryorder': 'array', 'categoryarray': merged_low_df['time']}
+        )
         st.plotly_chart(fig_low, use_container_width=True)
 
+        
 # ===== RUN QUERY =====
 query = "SELECT * FROM rpt_aus200"
 df = load_data(query)
