@@ -5,24 +5,35 @@ import json
 import os
 import plotly.graph_objects as go
 import numpy as np
-import plotly.io as pio
 import gdown
 
 # ===== DATABASE SETUP =====
 DB_PATH = "analytics.db"
 FILE_ID = "1r364Oitl8CnQ7-13e2egGOQ8mLwcv-JD"
+URL = f"https://drive.google.com/uc?id={FILE_ID}"
 
-url = f"https://drive.google.com/uc?id={FILE_ID}"
-st.sidebar.info("Downloading latest database... ⏳")
-gdown.download(url, DB_PATH, quiet=False, fuzzy=False)
+@st.cache_resource
+def get_connection():
+    # Download DB if missing
+    if not os.path.exists(DB_PATH) or os.path.getsize(DB_PATH) < 1000:
+        st.sidebar.info("Downloading latest database... ⏳")
+        gdown.download(URL, DB_PATH, quiet=False, fuzzy=False)
 
-# Verify the DB exists and isn't empty
-if not os.path.exists(DB_PATH) or os.path.getsize(DB_PATH) < 1000:
-    st.error("❌ Database download failed! Check the Google Drive link or permissions.")
-    st.stop()
+    # Verify DB exists
+    if not os.path.exists(DB_PATH) or os.path.getsize(DB_PATH) < 1000:
+        st.error("❌ Database download failed! Check the Google Drive link or permissions.")
+        st.stop()
 
-# Connect to the downloaded DB
-con = duckdb.connect(DB_PATH)
+    return duckdb.connect(DB_PATH)
+
+# Allow manual refresh
+if st.sidebar.button("🔄 Refresh DB"):
+    if os.path.exists(DB_PATH):
+        os.remove(DB_PATH)
+    st.cache_resource.clear()
+    st.experimental_rerun()
+
+con = get_connection()
 
 # ===== FUNCTION DEFINITIONS =====
 def calculate_stats(df, cols):
@@ -109,10 +120,8 @@ df['date'] = pd.to_datetime(df['date'])
 # ===== STREAMLIT FILTERS =====
 st.sidebar.header("Filters")
 
-# Let user pick which columns to filter
 filter_cols = st.sidebar.multiselect("Select columns to filter", df.columns)
 
-# Build filters dynamically
 for col in filter_cols:
     if df[col].dtype == 'object':
         options = df[col].dropna().unique().tolist()
@@ -142,29 +151,13 @@ st.title("AUS200 historical moves")
 st.dataframe(df)
 
 # Save matched dates
-matched_dates = (
-    df["date"].dt.date.unique().astype(str).tolist()
-)
+matched_dates = df["date"].dt.date.unique().astype(str).tolist()
 matched_dates = matched_dates[-20:]
-# Option 1: write to Streamlit's temp dir
 
 output_file = "matched_dates.json"
 with open(output_file, "w") as f:
     json.dump(matched_dates, f)
 st.sidebar.success(f"Matched dates saved to {output_file}")
-
-
-# Fallback: if /mount/tmp/ isn't writable, use current working directory
-try:
-    with open(output_file, "w") as f:
-        json.dump(matched_dates, f)
-except (FileNotFoundError, PermissionError):
-    output_file = "matched_dates.json"
-    with open(output_file, "w") as f:
-        json.dump(matched_dates, f)
-
-st.sidebar.success(f"Matched dates saved to {output_file}")
-
 
 numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
@@ -185,7 +178,6 @@ if cols_chart2:
     plot_with_zero_coloring(df, 'date', cols_chart2, "Chart 2: Selected Metrics with Zero-Based Coloring")
 
 # ===== PRINT CHARTS IN BROWSER =====
-
 st.sidebar.header("Candlestick Charts")
 if st.sidebar.button("Print Charts") and matched_dates:
     TF = "5m"
