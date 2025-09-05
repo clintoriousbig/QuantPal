@@ -10,7 +10,7 @@ import gdown
 
 # ===== DATABASE SETUP =====
 DB_PATH = "analytics.db"
-FILE_ID = "16YZgg2AU5k7XijCcrv_8lQov0--xXqJa"
+FILE_ID = "1r364Oitl8CnQ7-13e2egGOQ8mLwcv-JD"
 
 url = f"https://drive.google.com/uc?id={FILE_ID}"
 st.sidebar.info("Downloading latest database... ⏳")
