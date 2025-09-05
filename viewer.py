@@ -274,54 +274,6 @@ for group_name, group_cols in filter_groups.items():
 # Update the main DataFrame to the filtered version
 df = filtered_df
 
-# Create a master list of all columns to be filtered, using human-readable names
-all_filter_options = [filter_name_map[col] for group in filter_groups.values() for col in group if col in df.columns]
-
-selected_filters = st.sidebar.multiselect(
-    "Select metrics to filter",
-    options=all_filter_options
-)
-
-# Build filters dynamically based on the selected options
-filtered_df = df.copy() # Create a copy to apply filters
-for group_name, group_cols in filter_groups.items():
-    
-    # Check if any of the columns in the group are in the user's selection
-    intersection = [col for col in group_cols if filter_name_map.get(col) in selected_filters]
-    
-    if intersection:
-        with st.sidebar.expander(group_name, expanded=True):
-            for col in intersection:
-                human_name = filter_name_map[col]
-
-                if df[col].dtype == 'object':
-                    options = df[col].dropna().unique().tolist()
-                    selected = st.sidebar.multiselect(f"Filter {human_name}", options)
-                    if selected:
-                        filtered_df = filtered_df[filtered_df[col].isin(selected)]
-                
-                elif pd.api.types.is_numeric_dtype(df[col]):
-                    # Make sure the column exists in the DataFrame before getting min/max
-                    if col in df.columns:
-                        min_val, max_val = float(df[col].min()), float(df[col].max())
-                        selected_range = st.sidebar.slider(
-                            f"Filter {human_name}",
-                            min_val,
-                            max_val,
-                            (min_val, max_val)
-                        )
-                        filtered_df = filtered_df[(filtered_df[col] >= selected_range[0]) & (filtered_df[col] <= selected_range[1])]
-                
-                elif pd.api.types.is_datetime64_any_dtype(df[col]):
-                    min_date, max_date = df[col].min(), df[col].max()
-                    date_range = st.sidebar.date_input(f"Filter {human_name}", [min_date, max_date])
-                    if len(date_range) == 2:
-                        start, end = pd.to_datetime(date_range[0]), pd.to_datetime(date_range[1])
-                        filtered_df = filtered_df[(filtered_df[col] >= start) & (filtered_df[col] <= end)]
-
-# Update the main DataFrame to the filtered version
-df = filtered_df
-
 # ===== STREAMLIT UI =====
 st.title("AUS200 historical moves")
 
