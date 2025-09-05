@@ -12,13 +12,12 @@ import gdown
 DB_PATH = "analytics.db"
 FILE_ID = "1r364Oitl8CnQ7-13e2egGOQ8mLwcv-JD"
 
-if os.path.exists(DB_PATH):
-    os.remove(DB_PATH)
-
-url = f"https://drive.google.com/uc?id={FILE_ID}"
-st.sidebar.info("Downloading latest database... ⏳")
-gdown.download(url, DB_PATH, quiet=False, fuzzy=False)
-
+# Download the DB if it doesn't exist
+if not os.path.exists(DB_PATH):
+    st.sidebar.info("Downloading database... please wait ⏳")
+    url = f"https://drive.google.com/uc?id={FILE_ID}"
+    gdown.download(url, DB_PATH, quiet=False)
+    
 # Connect to the downloaded DB
 con = duckdb.connect(DB_PATH)
 
