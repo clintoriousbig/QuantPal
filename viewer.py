@@ -279,7 +279,7 @@ col1, col2, col3, col4 = st.columns(4)
 with col1:
     st.metric("Total Days", df.shape[0])
 with col2:
-    st.metric("Mean Daily Change (%)", f"{df['change_pct'].mean()}")
+    st.metric("Avg Daily Change (%)", f"{df['change_pct'].mean():.2f}")
 with col3:
     st.metric("Avg Open Gap (%)", f"{df['aus_gap_pct'].mean():.2f}")
 with col4:
@@ -310,7 +310,8 @@ numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
 # === Chart 1 ===
 st.header("Chart 1: Select metrics")
-cols_chart1 = st.multiselect("Columns for chart 1", options=numeric_cols, default=[], key="c1")
+selected_names_c1 = st.multiselect("Columns for chart 1", options=filter_name_map, key="c1")
+cols_chart1 = [name_filter_map[name] for name in selected_names_c1]
 if cols_chart1:
     st.subheader("Statistics for Chart 1 Metrics")
     st.table(calculate_stats(df, cols_chart1))
@@ -318,7 +319,8 @@ if cols_chart1:
 
 # === Chart 2 ===
 st.header("Chart 2: Select metrics")
-cols_chart2 = st.multiselect("Columns for chart 2", options=numeric_cols, default=[], key="c2")
+selected_names_c2 = st.multiselect("Columns for chart 2", options=filter_name_map, key="c2")
+cols_chart2 = [name_filter_map[name] for name in selected_names_c2]
 if cols_chart2:
     st.subheader("Statistics for Chart 2 Metrics")
     st.table(calculate_stats(df, cols_chart2))
