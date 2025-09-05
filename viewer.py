@@ -151,18 +151,6 @@ with open(output_file, "w") as f:
 st.sidebar.success(f"Matched dates saved to {output_file}")
 
 
-# Fallback: if /mount/tmp/ isn't writable, use current working directory
-try:
-    with open(output_file, "w") as f:
-        json.dump(matched_dates, f)
-except (FileNotFoundError, PermissionError):
-    output_file = "matched_dates.json"
-    with open(output_file, "w") as f:
-        json.dump(matched_dates, f)
-
-st.sidebar.success(f"Matched dates saved to {output_file}")
-
-
 numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
 # === Chart 1 ===
