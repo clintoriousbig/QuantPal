@@ -272,6 +272,17 @@ df = filtered_df
 
 # ===== STREAMLIT UI (UPDATED) =====
 st.title("AUS200 Historical Moves")
+logo_url = "https://drive.google.com/uc?export=download&id=1wrvaSwWQXoP-QKXq-pPzVK5qu73WFtEG" #https://drive.google.com/file/d/1wrvaSwWQXoP-QKXq-pPzVK5qu73WFtEG/view?usp=sharing
+landing_page_url = "https://coral-development-120771.framer.app/" # Replace with your actual landing page URL
+logo_html = f"""
+    <div style="float: left; margin-right: 20px;">
+        <a href="{landing_page_url}" target="_blank">
+            <img src="{logo_url}" alt="Logo" style="width: 150px; border-radius: 10px;">
+        </a>
+    </div>
+"""
+st.markdown(logo_html, unsafe_allow_html=True)
+st.markdown("<h1>AUS200 Historical Moves</h1>", unsafe_allow_html=True)
 
 ## Section 1: Key Metrics and Data Insights
 st.header("Key Insights")
@@ -289,30 +300,6 @@ with col4:
 st.subheader("Distribution of Daily Change (%)")
 fig_hist = px.histogram(df, x='change_pct', nbins=50, title='Daily Change Distribution')
 st.plotly_chart(fig_hist, use_container_width=True)
-
-# Correlation Heatmap
-st.subheader("Metric Correlations")
-numeric_cols_for_corr = df.select_dtypes(include=np.number).columns.tolist()
-# Create a selectbox to allow the user to choose which columns to include in the heatmap
-selected_corr_cols = st.multiselect(
-    "Select columns for correlation heatmap", 
-    options=numeric_cols_for_corr, 
-    default=['change_pct', 'aus_gap_pct', 'aus_prev_pct', 'rth_change_pts', 'rth_open2high']
-)
-if selected_corr_cols:
-    corr_df = df[selected_corr_cols].corr()
-    fig_corr = px.imshow(
-        corr_df,
-        text_auto=".2f",
-        aspect="auto",
-        title="Correlation Heatmap",
-        color_continuous_scale='Viridis'
-    )
-    st.plotly_chart(fig_corr, use_container_width=True)
-
-# Collapsible Dataframe
-with st.expander("View Filtered Data Table"):
-    st.dataframe(df)
 
 # Call the new function to plot the RTH high/low occurrences
 st.header("RTH High and Low Time Occurrences")
