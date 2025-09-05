@@ -110,40 +110,51 @@ def plot_with_zero_coloring(df, x_col, y_cols, chart_title):
     )
     st.plotly_chart(fig, use_container_width=True)
 
-def plot_high_low_occurrences(df):
+def plot_high_low_separate_charts(df):
     """
-    Generates a bar chart showing the occurrences of rth_high and rth_low times.
+    Generates two separate bar charts for RTH High and RTH Low occurrences.
     """
     if 'rth_high' not in df.columns or 'rth_low' not in df.columns:
         st.error("The dataframe must contain 'rth_high' and 'rth_low' columns.")
         return
-
-    # Combine rth_high and rth_low into a single Series and count occurrences
-    high_low_counts = pd.concat([df['rth_high'], df['rth_low']]).value_counts().reset_index()
-    high_low_counts.columns = ['time', 'occurrences']
     
-    # Sort the dataframe by time to ensure consistent ordering on the x-axis
-    high_low_counts['time'] = pd.to_datetime(high_low_counts['time'], format='%H:%M:%S').dt.time
-    high_low_counts = high_low_counts.sort_values(by='time')
-
-    # Create the bar chart using Plotly Express
-    fig = px.bar(
-        high_low_counts,
-        x='time',
-        y='occurrences',
-        title="Occurrences of RTH High and Low Times"
-    )
-
-    # Customize the chart layout
-    fig.update_layout(
-        xaxis_title="Time",
-        yaxis_title="Number of Occurrences",
-        title_x=0.5,
-        xaxis={'type': 'category'} # Treat x-axis as categories to avoid gaps
-    )
+    # Create two columns to display the charts side by side
+    col1, col2 = st.columns(2)
     
-    # Display the chart in Streamlit
-    st.plotly_chart(fig, use_container_width=True)
+    with col1:
+        # --- Plot 1: RTH High Occurrences (Green Bars) ---
+        high_counts = df['rth_high'].value_counts().reset_index()
+        high_counts.columns = ['time', 'occurrences']
+        high_counts['time'] = pd.to_datetime(high_counts['time'], format='%H:%M:%S').dt.time
+        high_counts = high_counts.sort_values(by='time')
+
+        fig_high = px.bar(
+            high_counts,
+            x='time',
+            y='occurrences',
+            title="RTH High Time Occurrences",
+        )
+        fig_high.update_traces(marker_color='green')
+        fig_high.update_layout(xaxis_title="Time", yaxis_title="Number of Occurrences", title_x=0.5, xaxis={'type': 'category'})
+        st.plotly_chart(fig_high, use_container_width=True)
+    
+    with col2:
+        # --- Plot 2: RTH Low Occurrences (Red Bars) ---
+        low_counts = df['rth_low'].value_counts().reset_index()
+        low_counts.columns = ['time', 'occurrences']
+        low_counts['time'] = pd.to_datetime(low_counts['time'], format='%H:%M:%S').dt.time
+        low_counts = low_counts.sort_values(by='time')
+
+        fig_low = px.bar(
+            low_counts,
+            x='time',
+            y='occurrences',
+            title="RTH Low Time Occurrences",
+        )
+        fig_low.update_traces(marker_color='red')
+        fig_low.update_layout(xaxis_title="Time", yaxis_title="Number of Occurrences", title_x=0.5, xaxis={'type': 'category'})
+        st.plotly_chart(fig_low, use_container_width=True)
+
 
 # ===== RUN QUERY =====
 query = "SELECT * FROM rpt_aus200"
@@ -187,7 +198,7 @@ st.dataframe(df)
 
 # Call the new function to plot the RTH high/low occurrences
 st.header("RTH High and Low Time Occurrences")
-plot_high_low_occurrences(df)
+plot_high_low_separate_charts(df)
 
 # Get all unique dates, sort them in descending order, and then get the top 20
 unique_dates = df['date'].dt.date.unique()
@@ -200,7 +211,6 @@ if 'matched_dates' not in st.session_state:
 
 st.session_state['matched_dates'] = matched_dates
 st.sidebar.success(f"Found {len(matched_dates)} dates for charts.")
-
 
 numeric_cols = df.select_dtypes(include='number').columns.tolist()
 
