@@ -10,7 +10,7 @@ import plotly.io as pio
 import gdown
 
 # Use Streamlit's page configuration for a wider layout
-st.set_page_config(layout='wide', page_title="AUS200 Dashboard", page_icon="📈")
+st.set_page_config(layout='wide')
 
 # ===== DATABASE SETUP =====
 DB_PATH = "analytics.db"
@@ -155,12 +155,15 @@ def plot_high_low_separate_charts(df):
         fig_low.update_layout(xaxis_title="Time", yaxis_title="Number of Occurrences", title_x=0.5, xaxis={'type': 'category'})
         st.plotly_chart(fig_low, use_container_width=True)
 
+
 # ===== RUN QUERY =====
 query = "SELECT * FROM rpt_aus200"
 df = load_data(query)
 df['date'] = pd.to_datetime(df['date'])
 
-# Create a mapping from snake_case to human-readable names
+# ===== STREAMLIT FILTERS =====
+st.sidebar.header("Filters")# Create a mapping from snake_case to human-readable names
+
 filter_name_map = {
     'aus_gap_pct': 'AUS Gap (%)',
     'spx_gap_pct': 'SPX Gap (%)',
@@ -208,11 +211,11 @@ name_filter_map = {v: k for k, v in filter_name_map.items()}
 
 # Define filter groups
 filter_groups = {
-    "Open Gaps 📊": ['aus_gap_pct', 'spx_gap_pct'],
-    "Previous Day Metrics 🗓️": ['aus_prev_pct', 'uk_prev_pct', 'bco_prev_pct', 'xau_prev_pct', 'spx_prev_pct', 'aud_prev_pct', 'prev_up_wick', 'prev_low_wick'],
-    "RTH Metrics 📈": ['rth_change_pts', 'rth_open2high', 'rth_open2low', 'rth_range'],
-    "Daily Moves ⏳": ['change_pct'],
-    "Early Morning Moves (5m/10m) ☕": [
+    "Open Gaps": ['aus_gap_pct', 'spx_gap_pct'],
+    "Previous Day Metrics": ['aus_prev_pct', 'uk_prev_pct', 'bco_prev_pct', 'xau_prev_pct', 'spx_prev_pct', 'aud_prev_pct', 'prev_up_wick', 'prev_low_wick'],
+    "RTH Metrics": ['rth_change_pts', 'rth_open2high', 'rth_open2low', 'rth_range'],
+    "Daily Moves": ['change_pct'],
+    "Early Morning Moves (5m/10m)": [
         'aus_950', 'aus_955', 'aus_1000', 'aus_1005',
         'open2high_950', 'open2low_950',
         'pct_to_high_1000', 'pct_to_low_1000',
@@ -222,20 +225,21 @@ filter_groups = {
         'pct_to_high_1020',
         'pct_to_low_1020'
     ],
-    "Hourly Moves ⏰": ['pct_9am', 'up_wick_9am', 'low_wick_9am', 'pct_10am', 'up_wick_10am', 'low_wick_10am'],
-    "News 📰": ['news', 'news_impact'],
-    "SPX RTH Metrics 🇺🇸": ['spx_950', 'spx_10']
+    "Hourly Moves": ['pct_9am', 'up_wick_9am', 'low_wick_9am', 'pct_10am', 'up_wick_10am', 'low_wick_10am'],
+    "News": ['news', 'news_impact'],
+    "SPX RTH Metrics": ['spx_950', 'spx_10']
 }
 
-# ===== STREAMLIT FILTERS (UPDATED) =====
-st.sidebar.header("Filters")
 # Create a copy of the dataframe to apply filters
 filtered_df = df.copy()
 
 # Loop through each filter group to create an expander
 for group_name, group_cols in filter_groups.items():
-    with st.sidebar.expander(group_name, expanded=False):
+    with st.sidebar.expander(group_name, expanded=False): # Set expanded=True to have them open by default
+        
+        # Loop through the columns within the current group
         for col in group_cols:
+            # Check if the column exists in the DataFrame before attempting to filter
             if col in df.columns:
                 human_name = filter_name_map[col]
 
@@ -270,49 +274,12 @@ for group_name, group_cols in filter_groups.items():
 # Update the main DataFrame to the filtered version
 df = filtered_df
 
-# ===== STREAMLIT UI (UPDATED) =====
-st.title("AUS200 Historical Moves")
+# ===== STREAMLIT UI =====
+st.title("AUS200 historical moves")
 
-## Section 1: Key Metrics and Data Insights
-st.header("Key Insights")
-col1, col2, col3, col4 = st.columns(4)
-with col1:
-    st.metric("Total Days", df.shape[0])
-with col2:
-    st.metric("Avg Daily Change (%)", f"{df['change_pct'].mean():.2f}")
-with col3:
-    st.metric("Avg Open Gap (%)", f"{df['aus_gap_pct'].mean():.2f}")
-with col4:
-    st.metric("Avg RTH Change (pts)", f"{df['rth_change_pts'].mean():.2f}")
-
-# Histogram for Daily Change
-st.subheader("Distribution of Daily Change (%)")
-fig_hist = px.histogram(df, x='change_pct', nbins=50, title='Daily Change Distribution')
-st.plotly_chart(fig_hist, use_container_width=True)
-
-# Correlation Heatmap
-st.subheader("Metric Correlations")
-numeric_cols_for_corr = df.select_dtypes(include=np.number).columns.tolist()
-# Create a selectbox to allow the user to choose which columns to include in the heatmap
-selected_corr_cols = st.multiselect(
-    "Select columns for correlation heatmap", 
-    options=numeric_cols_for_corr, 
-    default=['change_pct', 'aus_gap_pct', 'aus_prev_pct', 'rth_change_pts', 'rth_open2high']
-)
-if selected_corr_cols:
-    corr_df = df[selected_corr_cols].corr()
-    fig_corr = px.imshow(
-        corr_df,
-        text_auto=".2f",
-        aspect="auto",
-        title="Correlation Heatmap",
-        color_continuous_scale='Viridis'
-    )
-    st.plotly_chart(fig_corr, use_container_width=True)
-
-# Collapsible Dataframe
-with st.expander("View Filtered Data Table"):
-    st.dataframe(df)
+st.metric("Matched Days", df.shape[0])
+st.metric("Avg Daily Change", f"{df['change_pct'].mean():.2f}%")
+st.metric("Avg RTH Change", f"{df['rth_change_pts'].mean():.2f}%")
 
 # Call the new function to plot the RTH high/low occurrences
 st.header("RTH High and Low Time Occurrences")
